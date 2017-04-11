@@ -327,6 +327,22 @@ module ActiveRecord
     # a value of 'default_env' will still show tests failing. Just ignoring all
     # of them since we have no monkey in this circus.
     MergeAndResolveDefaultUrlConfigTest.coerce_all_tests! if defined?(MergeAndResolveDefaultUrlConfigTest)
+
+    class ConnectionHandlerTest < ActiveRecord::TestCase
+      if connection_sequel?
+        coerce_tests! :test_establish_connection_uses_spec_name
+      end
+    end
+
+    class ConnectionSpecification
+      class ResolverTest < ActiveRecord::TestCase
+        if connection_sequel?
+          # coerce tests that try to load sqlite adapter.
+          coerce_tests! :test_spec_name_on_key_lookup
+          coerce_tests! :test_spec_name_with_inline_config
+        end
+      end
+    end
   end
 end
 
@@ -692,6 +708,8 @@ class RelationTest < ActiveRecord::TestCase
     assert_equal topics(:second).title, topics.first.title
   end
 end
+
+
 
 
 
