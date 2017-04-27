@@ -69,7 +69,3 @@ group :guard do
   gem 'guard-minitest'
 end
 
-platform :jruby do
-  gem 'sequel'
-end
-

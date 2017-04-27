@@ -155,7 +155,7 @@ class CalculationsTest < ActiveRecord::TestCase
   coerce_tests! :test_having_with_strong_parameters
 
   # Leave it up to users to qualify columns so pluck works correctly.
-  coerce_tests!(:test_pluck_columns_with_same_name) if connection_sequel?
+  coerce_tests!(:test_pluck_columns_with_same_name) if connection_jdbc?
   def test_pluck_columns_with_same_name_coerced
     expected = [["The First Topic", "The Second Topic of the day"], ["The Third Topic of the day", "The Fourth Topic of the day"]]
     actual = Topic.joins(:replies)
@@ -329,14 +329,14 @@ module ActiveRecord
     MergeAndResolveDefaultUrlConfigTest.coerce_all_tests! if defined?(MergeAndResolveDefaultUrlConfigTest)
 
     class ConnectionHandlerTest < ActiveRecord::TestCase
-      if connection_sequel?
+      if connection_jdbc?
         coerce_tests! :test_establish_connection_uses_spec_name
       end
     end
 
     class ConnectionSpecification
       class ResolverTest < ActiveRecord::TestCase
-        if connection_sequel?
+        if connection_jdbc?
           # coerce tests that try to load sqlite adapter.
           coerce_tests! :test_spec_name_on_key_lookup
           coerce_tests! :test_spec_name_with_inline_config
