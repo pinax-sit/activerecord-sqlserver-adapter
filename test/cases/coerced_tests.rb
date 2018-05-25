@@ -175,6 +175,16 @@ class CalculationsTest < ActiveRecord::TestCase
 
   # Leave it up to users to format selects/functions so HAVING works correctly.
   coerce_tests! :test_having_with_strong_parameters
+
+  # Leave it up to users to qualify columns so pluck works correctly.
+  coerce_tests!(:test_pluck_columns_with_same_name) if connection_jdbc?
+  def test_pluck_columns_with_same_name_coerced
+    expected = [["The First Topic", "The Second Topic of the day"], ["The Third Topic of the day", "The Fourth Topic of the day"]]
+    actual = Topic.joins(:replies)
+        .pluck('topics.title t1', 'replies_topics.title t2')
+    assert_equal expected, actual
+  end
+
 end
 
 
@@ -339,6 +349,25 @@ module ActiveRecord
     # a value of 'default_env' will still show tests failing. Just ignoring all
     # of them since we have no monkey in this circus.
     MergeAndResolveDefaultUrlConfigTest.coerce_all_tests! if defined?(MergeAndResolveDefaultUrlConfigTest)
+
+    class ConnectionHandlerTest < ActiveRecord::TestCase
+      if connection_jdbc?
+        coerce_tests! :test_establish_connection_uses_spec_name
+        coerce_tests! :test_establish_connection_using_top_level_key_in_two_level_config
+        coerce_tests! :test_establish_connection_using_two_level_configurations
+        coerce_tests! :test_establish_connection_using_3_levels_config
+      end
+    end
+
+    class ConnectionSpecification
+      class ResolverTest < ActiveRecord::TestCase
+        if connection_jdbc?
+          # coerce tests that try to load sqlite adapter.
+          coerce_tests! :test_spec_name_on_key_lookup
+          coerce_tests! :test_spec_name_with_inline_config
+        end
+      end
+    end
   end
 end
 
@@ -704,6 +733,8 @@ class RelationTest < ActiveRecord::TestCase
     assert_equal topics(:second).title, topics.first.title
   end
 end
+
+
 
 
 
